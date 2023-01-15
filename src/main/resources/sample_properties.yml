@@ -1,0 +1,52 @@
+# 아래 내용을 수정하여 src/main/resources-dev/properties.yml 및 src/main/resources-prod/properties.yml 으로 저장할 것
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/MYBOOKS?serverTimezone=Asia/Seoul
+    username: username
+    password: password
+  jpa:
+    show-sql: true
+    database: mysql
+    properties:
+      hibernate:
+        '[default_schema]': MYBOOKS
+        ddl-auto: validate
+        '[format_sql]': true
+  devtools:
+    livereload:
+      #JSP 는 서버 재시작 없이 반영될 수 있도록 하는 설정, 개발시에는 true, 운영은 false 로 함. (페이지 로딩 속도 이슈)
+      enabled: true
+  main:
+    allow-bean-definition-overriding: true
+  redis:
+    host: 127.0.0.1
+    port: 6379
+server:
+  port: 8080
+jwt:
+  access-token-secret:
+    security
+  access-token-expire:
+    1800000 #30분
+  refresh-token-secret:
+    security
+  refresh-token-expire:
+    604800000 #1주일
+cors:
+  allowed-servers: http://localhost:3000
+
+logging:
+  level:
+    root: INFO
+    '[co.hanbin.mybooks]': DEBUG
+    org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
