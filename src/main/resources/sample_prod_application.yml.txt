@@ -1,8 +1,8 @@
-# 아래 내용을 수정하여 src/main/resources-dev/application.yml 및 src/main/resources-prod/application.yml 으로 저장할 것
+# 아래 내용을 수정하여 src/main/resources-prod/application.yml 으로 저장할 것
 spring:
   config:
     activate:
-      on-profile: dev
+      on-profile: prod
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/MYBOOKS?serverTimezone=Asia/Seoul

@@ -1,0 +1,54 @@
+# 아래 내용을 수정하여 src/main/resources-dev/application.yml 으로 저장할 것
+spring:
+  config:
+    activate:
+      on-profile: dev
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  datasource:
+    url: jdbc:h2:file:~/test
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+  devtools:
+    livereload:
+      #JSP 는 서버 재시작 없이 반영될 수 있도록 하는 설정, 개발시에는 true, 운영은 false 로 함. (페이지 로딩 속도 이슈)
+      enabled: true
+  main:
+    allow-bean-definition-overriding: true
+  redis:
+    host: 127.0.0.1
+    port: 6379
+server:
+  port: 8080
+jwt:
+  access-token-secret:
+    hanbinbssecurityhanbinbssecurityhanbinbssecurityhanbinbssecurityhanbinbssecurityhanbinbssecurity
+  access-token-expire:
+    1800000 #30분
+  refresh-token-secret:
+    hanbinbssecurityhanbinbssecurityhanbinbssecurityhanbinbssecurityhanbinbssecurityhanbinbssecurityhanbinbssecurity
+  refresh-token-expire:
+    604800000 #1주일
+cors:
+  allowed-servers: http://localhost:3000
+
+logging:
+  level:
+    root: INFO
+    '[co.hanbin.mybooks]': DEBUG
+    org:
+      hibernate:
+        SQL: debug
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
