@@ -4,9 +4,11 @@
 ## 설정 방법
 ### macOS + VScode
 #### Java
-홈브루 설치하고 터미널에서 brew install openjdk@17
+홈브루 설치하고 터미널에서 아래 실행
+> brew install openjdk@17
 
-VSCode에서 설정 들어가서 jdk라고 검색 후 settings.json 편집으로 들어가서 "java.jdt.ls.java.home": "/usr/local/opt/openjdk@17", 추가
+VSCode에서 설정 들어가서 jdk라고 검색 후 settings.json 편집으로 들어가서 아래 추가
+> "java.jdt.ls.java.home": "/usr/local/opt/openjdk@17",
 
 #### Next.js
 추후 기재
