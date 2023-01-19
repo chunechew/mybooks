@@ -22,4 +22,13 @@ VSCode에서 설정 들어가서 jdk라고 검색 후 settings.json 편집으로
 VSCode 창 닫았다 다시 열고 좌측 실행 및 디버그 버튼 누르고 서버 실행.
 
 #### Next.js
-추후 기재
+VScode 터미널 
+> cd src/main/ui/my-app
+> npm install
+
+만약에 npm 버전이 안 맞으면 `nvm` 설치 후 기본 버전으로 변경 후 `npm install` 하면 됨.
+> nvm install 18.12.0
+> nvm alias default 18.12.0
+
+빌드 후 서버 실행
+> npx next build && node server
