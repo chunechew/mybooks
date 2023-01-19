@@ -19,7 +19,7 @@ import co.hanbin.mybooks.member.service.CookieUtil;
 import co.hanbin.mybooks.member.service.MemberService;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/member")
 public class MemberController {
 
     @Autowired
