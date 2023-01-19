@@ -9,7 +9,7 @@ import co.hanbin.mybooks.member.repository.MemberRepository;
 
 @Service
 public class MemberServiceImpl implements MemberService {
-    @Value("${spring.jwt.access-token-secret}")
+    @Value("${jwt.access-token-secret}")
     private String ACCESS_TOKEN_SECRET;
 
     @Autowired
