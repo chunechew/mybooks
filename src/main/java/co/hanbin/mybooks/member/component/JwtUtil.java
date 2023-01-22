@@ -3,11 +3,12 @@ package co.hanbin.mybooks.member.component;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import co.hanbin.mybooks.member.entity.Member;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -16,21 +17,6 @@ import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JwtUtil {
-    // @Value("${jwt.access-token-secret}")
-    // public static String ACCESS_TOKEN_SECRET;
-
-    // @Value("${jwt.access-token-expire}")
-    // public static long ACCESS_TOKEN_EXPIRE;
-
-    // @Value("${jwt.refresh-token-secret}")
-    // public static String REFRESH_TOKEN_SECRET;
-
-    // @Value("${jwt.refresh-token-expire}")
-    // public static long REFRESH_TOKEN_EXPIRE;
-
-    // final static public String ACCESS_TOKEN_NAME = "accessToken";
-    // final static public String REFRESH_TOKEN_NAME = "refreshToken";
-
     private Key getSigningKey(String secretKey) {
         byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
@@ -53,21 +39,13 @@ public class JwtUtil {
         return expiration.before(new Date());
     }
 
-    // public String generateAccessToken(Member member, String secretKey, long expireTime) {
-    //     return doGenerateToken(member.getUsername(), secretKey, expireTime);
-    // }
-
-    // public String generateRefreshToken(Member member, String secretKey, long expireTime) {
-    //     return doGenerateToken(member.getUsername(), secretKey, expireTime);
-    // }
-
-    public String doGenerateToken(String username, String secretKey, long expireTime) {
-
-        Claims claims = Jwts.claims();
-        claims.put("username", username);
+    public String doGenerateToken(String username, String role, String secretKey, long expireTime) {
+        Map<String, String> claim = new HashMap<>();
+        claim.put("username", username);
+        claim.put("role", role);
 
         String jwt = Jwts.builder()
-                .setClaims(claims)
+                .setClaims(claim)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expireTime))
                 .signWith(getSigningKey(secretKey), SignatureAlgorithm.HS256)

@@ -1,6 +1,7 @@
 package co.hanbin.mybooks.config.security;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
@@ -9,6 +10,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import co.hanbin.mybooks.member.entity.Member;
 import co.hanbin.mybooks.member.repository.PrincipalDetails;
 import co.hanbin.mybooks.member.service.MemberService;
+import co.hanbin.mybooks.member.service.SaltUtil;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -31,8 +34,10 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter{
 	
 	private MemberService memberService;
+	
 	@Value("${jwt.access-token-expire}")
     private long VALID_TIME;
+
 	@Value("${jwt.access-token-secret}")
 	private String SECRET_KEY;
 
@@ -83,7 +88,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	}
 
 	private Key getSecretKey() {
-		byte[] KeyBytes = SECRET_KEY.getBytes();
+		byte[] KeyBytes = SECRET_KEY.getBytes(StandardCharsets.UTF_8);
 		return Keys.hmacShaKeyFor(KeyBytes);
 	}
 	

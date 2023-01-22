@@ -65,10 +65,11 @@ public class MemberController {
         try {
             String username = member.getUsername();
             String password = member.getPassword();
+            String role = member.getRole().name();
             member = memberService.login(username, password);
             password = member.getPassword();
-            final String accessToken = jwtUtil.doGenerateToken(username, ACCESS_TOKEN_SECRET, ACCESS_TOKEN_EXPIRE);
-            final String refreshToken = jwtUtil.doGenerateToken(username, REFRESH_TOKEN_SECRET, REFRESH_TOKEN_EXPIRE);
+            final String accessToken = jwtUtil.doGenerateToken(username, role, ACCESS_TOKEN_SECRET, ACCESS_TOKEN_EXPIRE);
+            final String refreshToken = jwtUtil.doGenerateToken(username, role, REFRESH_TOKEN_SECRET, REFRESH_TOKEN_EXPIRE);
 
             redisUtil.setDataExpire(refreshToken, member.getUsername(), REFRESH_TOKEN_EXPIRE);
             
