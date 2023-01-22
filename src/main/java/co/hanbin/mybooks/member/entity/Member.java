@@ -68,7 +68,4 @@ public class Member {
 
 	@Transient
 	private String refreshTokenExpire;
-
-    @Transient
-    private String salt;
 }

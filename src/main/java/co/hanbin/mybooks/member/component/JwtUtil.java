@@ -4,7 +4,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -17,20 +16,20 @@ import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JwtUtil {
-    @Value("${jwt.access-token-secret}")
-    public static String ACCESS_TOKEN_SECRET;
+    // @Value("${jwt.access-token-secret}")
+    // public static String ACCESS_TOKEN_SECRET;
 
-    @Value("${jwt.access-token-expire}")
-    public static long ACCESS_TOKEN_EXPIRE;
+    // @Value("${jwt.access-token-expire}")
+    // public static long ACCESS_TOKEN_EXPIRE;
 
-    @Value("${jwt.refresh-token-secret}")
-    public static String REFRESH_TOKEN_SECRET;
+    // @Value("${jwt.refresh-token-secret}")
+    // public static String REFRESH_TOKEN_SECRET;
 
-    @Value("${jwt.refresh-token-expire}")
-    public static long REFRESH_TOKEN_EXPIRE;
+    // @Value("${jwt.refresh-token-expire}")
+    // public static long REFRESH_TOKEN_EXPIRE;
 
-    final static public String ACCESS_TOKEN_NAME = "accessToken";
-    final static public String REFRESH_TOKEN_NAME = "refreshToken";
+    // final static public String ACCESS_TOKEN_NAME = "accessToken";
+    // final static public String REFRESH_TOKEN_NAME = "refreshToken";
 
     private Key getSigningKey(String secretKey) {
         byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
@@ -54,13 +53,13 @@ public class JwtUtil {
         return expiration.before(new Date());
     }
 
-    public String generateToken(Member member) {
-        return doGenerateToken(member.getUsername(), ACCESS_TOKEN_SECRET, ACCESS_TOKEN_EXPIRE);
-    }
+    // public String generateAccessToken(Member member, String secretKey, long expireTime) {
+    //     return doGenerateToken(member.getUsername(), secretKey, expireTime);
+    // }
 
-    public String generateRefreshToken(Member member) {
-        return doGenerateToken(member.getUsername(), REFRESH_TOKEN_SECRET, REFRESH_TOKEN_EXPIRE);
-    }
+    // public String generateRefreshToken(Member member, String secretKey, long expireTime) {
+    //     return doGenerateToken(member.getUsername(), secretKey, expireTime);
+    // }
 
     public String doGenerateToken(String username, String secretKey, long expireTime) {
 

@@ -1,10 +1,13 @@
 package co.hanbin.mybooks.member.controller;
 
-import javax.servlet.http.Cookie;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,22 +17,28 @@ import co.hanbin.mybooks.db.service.RedisUtil;
 import co.hanbin.mybooks.member.component.JwtUtil;
 import co.hanbin.mybooks.member.entity.Member;
 import co.hanbin.mybooks.member.entity.Response;
-import co.hanbin.mybooks.member.entity.request.RequestLoginUser;
-import co.hanbin.mybooks.member.service.CookieUtil;
 import co.hanbin.mybooks.member.service.MemberService;
 
 @RestController
-@RequestMapping("/member")
+@RequestMapping("/api/member")
 public class MemberController {
+    @Value("${jwt.access-token-secret}")
+    public String ACCESS_TOKEN_SECRET;
+
+    @Value("${jwt.access-token-expire}")
+    public long ACCESS_TOKEN_EXPIRE;
+
+    @Value("${jwt.refresh-token-secret}")
+    public String REFRESH_TOKEN_SECRET;
+
+    @Value("${jwt.refresh-token-expire}")
+    public long REFRESH_TOKEN_EXPIRE;
 
     @Autowired
     private MemberService memberService;
 
     @Autowired
     private JwtUtil jwtUtil;
-
-    @Autowired
-    private CookieUtil cookieUtil;
 
     @Autowired
     private RedisUtil redisUtil;
@@ -50,19 +59,24 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public Response login(@RequestBody RequestLoginUser user,
+    public Response login(@RequestBody Member member,
                           HttpServletRequest req,
                           HttpServletResponse res) {
         try {
-            final Member member = memberService.loginUser(user.getUsername(), user.getPassword());
-            final String token = jwtUtil.generateToken(member);
-            final String refreshJwt = jwtUtil.generateRefreshToken(member);
-            Cookie accessToken = cookieUtil.createCookie(JwtUtil.ACCESS_TOKEN_NAME, token);
-            Cookie refreshToken = cookieUtil.createCookie(JwtUtil.REFRESH_TOKEN_NAME, refreshJwt);
-            redisUtil.setDataExpire(refreshJwt, member.getUsername(), JwtUtil.REFRESH_TOKEN_EXPIRE);
-            res.addCookie(accessToken);
-            res.addCookie(refreshToken);
-            return new Response("success", "로그인에 성공했습니다.", token);
+            String username = member.getUsername();
+            String password = member.getPassword();
+            member = memberService.login(username, password);
+            password = member.getPassword();
+            final String accessToken = jwtUtil.doGenerateToken(username, ACCESS_TOKEN_SECRET, ACCESS_TOKEN_EXPIRE);
+            final String refreshToken = jwtUtil.doGenerateToken(username, REFRESH_TOKEN_SECRET, REFRESH_TOKEN_EXPIRE);
+
+            redisUtil.setDataExpire(refreshToken, member.getUsername(), REFRESH_TOKEN_EXPIRE);
+            
+            Map<String, Object> data = new HashMap<>();
+            data.put("accessToken", accessToken);
+            data.put("refreshToken", refreshToken);
+
+            return new Response("success", "로그인에 성공했습니다.", data);
         } catch (Exception e) {
             return new Response("error", "로그인에 실패했습니다.", e.getMessage());
         }

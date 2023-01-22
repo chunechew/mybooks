@@ -28,14 +28,11 @@ spring:
 server:
   port: 8080
 jwt:
-  access-token-secret:
-    security
-  access-token-expire:
-    1800000 #30분
-  refresh-token-secret:
-    security
-  refresh-token-expire:
-    604800000 #1주일
+  access-token-secret: 솔트
+  access-token-expire: 1800000 #30분
+  refresh-token-secret: 솔트
+  refresh-token-expire: 604800000 #1주일
+password-salt: 솔트
 cors:
   allowed-servers: http://localhost:3000
 

@@ -1,65 +1,104 @@
 package co.hanbin.mybooks.config.security;
 
+import java.io.IOException;
+import java.security.Key;
+import java.util.Date;
+
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.util.StringUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import co.hanbin.mybooks.member.repository.PrincipalDetails;
+import co.hanbin.mybooks.member.service.MemberService;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 
-import io.jsonwebtoken.io.IOException;
-import lombok.extern.slf4j.Slf4j;
+public class JwtAuthorizationFilter extends BasicAuthenticationFilter{
 
-@Slf4j
-public class JwtAuthorizationFilter extends UsernamePasswordAuthenticationFilter{
-	// https://velog.io/@chullll/Spring-Security-JWT-%ED%95%84%ED%84%B0-%EC%A0%81%EC%9A%A9-%EA%B3%BC%EC%A0%95
-	private final AuthenticationManager authenticationManager;
-	private final JwtTokenProvider jwtTokenProvider;
+	@Value("${jwt.access-token-expire}")
+	private String SECRET_KEY;
 	
-	public JwtAuthorizationFilter(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider) {
-		this.authenticationManager = authenticationManager;
-		this.jwtTokenProvider = jwtTokenProvider;
+	private final MemberService memberService;
+	
+	public JwtAuthorizationFilter(AuthenticationManager authenticationManager
+								, MemberService memberService) {
 		
-		setFilterProcessesUrl("/api/member/login");
+		super(authenticationManager);
+		this.memberService = memberService;
 	}
-	
+
 	@Override
-	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
-			throws AuthenticationException {
-		log.info("USERNAMEPASSWORD_FILTER");
-		ObjectMapper om = new ObjectMapper();
-		MemberLogin memberLogin = null;
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
 		
 		try {
-			memberLogin = om.readValue(request.getInputStream(), MemberLogin.class);
+			String tokenHeader = request.getHeader("Authorization");
+			String jwtToken = null;
+			
+			if(StringUtils.hasText(tokenHeader) && tokenHeader.startsWith("Bearer")) {
+				jwtToken = tokenHeader.replace("Bearer ", "");
+			}
+		
+			if(jwtToken != null && isValid(jwtToken)) {
+				SecurityContextHolder.getContext().setAuthentication(getAuth(jwtToken));
+			}
+			
 		}catch (Exception e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
-		log.info("member : {}", memberLogin);
-		UsernamePasswordAuthenticationToken authenticationToken = 
-				new UsernamePasswordAuthenticationToken(memberLogin.getUsername(), memberLogin.getPassword());
 		
-		Authentication authentication = authenticationManager.authenticate(authenticationToken);
-		
-		return authentication;
+		chain.doFilter(request, response);
 	}
 
-	@Override
-	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
-			Authentication authResult) throws IOException, ServletException {
-		
-		PrincipalDetails principalDetails = (PrincipalDetails) authResult.getPrincipal();
-		
-		String jwtToken = jwtTokenProvider.generateToken(principalDetails.getUsername());
-		
-		response.getWriter().write("Bearer " + jwtToken);
-		response.getWriter().flush();
+	private Authentication getAuth(String jwtToken) {
+		PrincipalDetails user = (PrincipalDetails)memberService.loadUserByUsername(getEmail(jwtToken));
+		return new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), user.getAuthorities());
 	}
 	
+	private String getEmail(String jwtToken) {
+		return Jwts.parserBuilder()
+					.setSigningKey(getSecretKey())
+					.build()
+					.parseClaimsJws(jwtToken).getBody()
+					.getSubject();
+	}
+	
+	private boolean isValid(String jwtToken) {
+		boolean ret = true; 
+		
+		Jws<Claims> jws = null;
+		
+		try {
+			jws = Jwts.parserBuilder()
+				.setSigningKey(getSecretKey())
+				.build()
+				.parseClaimsJws(jwtToken);
+		
+			if( jws == null ||
+				jws.getBody().getSubject() == null ||
+				jws.getBody().getExpiration().before(new Date())) {
+				ret = false;
+			}
+			
+		}catch (Exception e) {
+			ret = false;
+		}
+		return ret;
+	}
+	
+	private Key getSecretKey() {
+		byte[] keyBytes = SECRET_KEY.getBytes();
+		return Keys.hmacShaKeyFor(keyBytes);
+	}
 }
