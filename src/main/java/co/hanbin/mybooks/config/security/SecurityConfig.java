@@ -16,8 +16,8 @@ import co.hanbin.mybooks.member.enumerate.MemberRole;
 
 @Configuration
 public class SecurityConfig {
-	public final String API_DIRECTORY = "/api/";
-	public final String API_DIRECTORY_EXCEPTION = "/api/member/";
+	public final String API_DIRECTORY = "/api/"; // 로그인된 사용자만 허용할 경로
+	public final String API_DIRECTORY_EXCEPTION = "/api/member/"; // API_DIRECTORY에 해당돼도 예외적으로 모든 사용자에게 허용할 경로
 
 	@Autowired
 	private Environment environment;
@@ -40,6 +40,7 @@ public class SecurityConfig {
 		String[] profilesArray = environment.getActiveProfiles();
 		List<String> profiles = Arrays.asList(profilesArray);
 
+		// 개발 모드에서만 허용(Swagger UI, H2 Console)
 		if(profiles.contains("dev")) {
 			http.authorizeRequests()
 					.antMatchers("/swagger-resources/**", "/swagger-ui/**", "/v2/api-docs", "/h2-console/**").permitAll().and()
@@ -49,7 +50,7 @@ public class SecurityConfig {
 		http.cors().and().csrf().disable()
 				.formLogin().disable().logout().invalidateHttpSession(true).clearAuthentication(true).permitAll().and()
 				.authorizeRequests()
-					.antMatchers("/favicon.ico", "/error", "/api/member/**").permitAll()
+					.antMatchers("/favicon.ico", "/error", API_DIRECTORY_EXCEPTION + "**").permitAll()
 					.antMatchers(API_DIRECTORY + "**").hasAnyAuthority(MemberRole.ROLE_USER.name(), MemberRole.ROLE_ADMIN.name())
 					.anyRequest().denyAll().and()
 				.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
