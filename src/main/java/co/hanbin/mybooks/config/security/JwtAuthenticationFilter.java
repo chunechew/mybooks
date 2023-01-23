@@ -77,9 +77,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 					if(auth != null) {
 						SecurityContextHolder.getContext().setAuthentication(auth); // Spring Security의 세션에 로그인 처리(권한 체크 때문에 필요함)
 					} else {
+						new SecurityContextLogoutHandler().logout(request, response, null);
 						throw new JwtException("No such account!");
 					}
-				} else { // null(계정 없음) / false(유효하지 않은 토큰)
+				} else if(isJwtValid != null && isJwtValid == false) { // 계정 없음
+					throw new JwtException("No such account!");
+				} else { // Access token이 만료됨
 					String refreshToken = request.getHeader("Refresh-token");
 
 					if(refreshToken != null) { // Refresh token으로 JWT 재발급
@@ -110,10 +113,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 									throw new JwtException("No such account!");
 								}
 							} else {
+								new SecurityContextLogoutHandler().logout(request, response, null);
 								throw new ExpiredJwtException(null, null, null);
 							}
 						}
-					}				
+					} else {
+						new SecurityContextLogoutHandler().logout(request, response, null);
+						throw new ExpiredJwtException(null, null, null);
+					}	
 				}
 			} catch(ExpiredJwtException e) {
 				log.error("doFilterInternal - ExpiredJwtException");
