@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -22,9 +21,6 @@ public class SecurityConfig {
 
 	@Autowired
 	private Environment environment;
-	
-	// @Autowired
-	// private MemberService memberService;
 
 	@Autowired
 	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
@@ -34,15 +30,9 @@ public class SecurityConfig {
         return new CustomAuthenticationManager();
     }
 
-	// @Bean
-	// public JwtAuthenticationFilter getJwtAuthenticationFilter() throws Exception {
-	// 	JwtAuthenticationFilter filter = new JwtAuthenticationFilter(authenticationManager(), memberService);
-	// 	return filter;
-	// }
-
 	@Bean
-	public JwtAuthorizationFilter getJwtAuthorizationFilter() throws Exception {
-		return new JwtAuthorizationFilter(/*authenticationManager(), memberService*/);
+	public JwtAuthenticationFilter getJwtAuthenticationFilter() throws Exception {
+		return new JwtAuthenticationFilter();
 	}
 
     @Bean
@@ -60,14 +50,10 @@ public class SecurityConfig {
 				.formLogin().disable().logout().invalidateHttpSession(true).clearAuthentication(true).permitAll().and()
 				.authorizeRequests()
 					.antMatchers("/favicon.ico", "/error", "/api/member/**").permitAll()
-					.antMatchers(API_DIRECTORY + "**").authenticated()//.hasAnyRole(MemberRole.ROLE_USER.name(), MemberRole.ROLE_ADMIN.name())
+					.antMatchers(API_DIRECTORY + "**").hasAnyAuthority(MemberRole.ROLE_USER.name(), MemberRole.ROLE_ADMIN.name())
 					.anyRequest().denyAll().and()
 				.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
-				// .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS).and()
-				// .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-				// .addFilter(getJwtAuthenticationFilter())
-				// .addFilterBefore(getJwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
-				.addFilterBefore(getJwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+				.addFilterBefore(getJwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 		
         return http.build();
     }
