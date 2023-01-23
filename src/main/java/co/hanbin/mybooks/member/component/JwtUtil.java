@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Component;
 
 import co.hanbin.mybooks.member.repository.PrincipalDetails;
 import co.hanbin.mybooks.member.service.MemberService;
-import co.hanbin.mybooks.member.service.SaltUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
@@ -27,12 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class JwtUtil {
-    @Value("${password-salt}")
-    private String PASSWORD_SALT;
-
-    @Autowired
-    private SaltUtil saltUtil;
-
     @Autowired
 	private MemberService memberService;
 
@@ -87,7 +79,6 @@ public class JwtUtil {
 		log.debug("getAuth > user: " + user.getUsername() + ", " + user.getPassword() + ", " + user.getAuthorities());
 		
 		if(user != null && user.getUsername() != null) {
-			// final String ENCODED_PASSWORD = saltUtil.encodePassword(PASSWORD_SALT, user.getPassword());
 			auth = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), user.getAuthorities());
 		}
 		
