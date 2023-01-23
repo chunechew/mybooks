@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +22,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import co.hanbin.mybooks.db.service.RedisUtil;
 import co.hanbin.mybooks.member.component.JwtUtil;
@@ -92,13 +95,23 @@ public class MemberServiceImpl implements MemberService {
             redisUtil.setDataExpire("AT:" + username, accessToken, current + ACCESS_TOKEN_EXPIRE);
             redisUtil.setDataExpire("RT:" + username, refreshToken, current + REFRESH_TOKEN_EXPIRE);
             
-            Map<String, Object> data = new HashMap<>();
-            data.put("accessToken", accessToken);
-            data.put("accessTokenExpire", current + ACCESS_TOKEN_EXPIRE);
-            data.put("refreshToken", refreshToken);
-            data.put("refreshTokenExpire", current + REFRESH_TOKEN_EXPIRE);
+            ServletRequestAttributes attributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
+            HttpServletRequest request = null;
+            
+            if(attributes != null) {
+                request = attributes.getRequest();
+                HttpSession session = request.getSession();
 
-            return new JsonResponse("success", "로그인에 성공했습니다.", data);
+                Map<String, Object> newTokens = new HashMap<>();
+                newTokens.put("accessToken", accessToken);
+                newTokens.put("accessTokenExpire", current + ACCESS_TOKEN_EXPIRE);
+                newTokens.put("refreshToken", refreshToken);
+                newTokens.put("refreshTokenExpire", current + REFRESH_TOKEN_EXPIRE);
+
+                session.setAttribute("newTokens", newTokens); // 새 토큰을 Spring Framework 세션에 임시 기억(JsonResponse에서 참조)
+            }
+
+            return new JsonResponse("success", "로그인에 성공했습니다.", null);
         } catch (Exception e) {
             return new JsonResponse("error", "로그인에 실패했습니다.", e.getMessage());
         }
@@ -203,14 +216,14 @@ public class MemberServiceImpl implements MemberService {
                 redisUtil.setDataExpire("AT:" + username, accessToken, current + ACCESS_TOKEN_EXPIRE);
                 redisUtil.setDataExpire("RT:" + username, refreshToken, current + REFRESH_TOKEN_EXPIRE);
                 
-                Map<String, Object> data = new HashMap<>();
-                data.put("accessToken", accessToken);
-                data.put("accessTokenExpire", current + ACCESS_TOKEN_EXPIRE);
-                data.put("refreshToken", refreshToken);
-                data.put("refreshTokenExpire", current + REFRESH_TOKEN_EXPIRE);
+                Map<String, Object> newTokens = new HashMap<>();
+                newTokens.put("accessToken", accessToken);
+                newTokens.put("accessTokenExpire", current + ACCESS_TOKEN_EXPIRE);
+                newTokens.put("refreshToken", refreshToken);
+                newTokens.put("refreshTokenExpire", current + REFRESH_TOKEN_EXPIRE);
 
                 result.put("status", "success");
-                result.put("data", data);
+                result.put("newTokens", newTokens);
 
                 return result;
             } else {

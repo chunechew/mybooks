@@ -67,10 +67,10 @@ public class MemberController {
         
         if(status.contentEquals("success")) {
             @SuppressWarnings("unchecked")
-            Map<String, Object> data = (Map<String, Object>)(result.get("data"));
+            Map<String, Object> newTokens = (Map<String, Object>)(result.get("newTokens"));
 
             HttpSession session = request.getSession();
-            session.setAttribute("newTokens", data); // 새 토큰을 세션에 기억(JsonResponse에서 참조)
+            session.setAttribute("newTokens", newTokens); // 새 토큰을 세션에 기억(JsonResponse에서 참조)
 
             return new JsonResponse("success", "JWT 재발급에 성공했습니다.", null);
         } else {

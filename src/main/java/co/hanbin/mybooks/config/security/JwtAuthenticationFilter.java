@@ -46,26 +46,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 
+		// /api/ 이고 /api/member/ 가 아닐 때만 필터링 적용
 		String uri = request.getRequestURI();
 		if(uri.contains(securityConfig.API_DIRECTORY) && !uri.contains(securityConfig.API_DIRECTORY_EXCEPTION)) {
 			log.debug("doFilterInternal - Checking ACCESS_TOKEN_SECRET: " + ACCESS_TOKEN_SECRET);
 			log.debug("doFilterInternal - try");
 			
 			try {
-				// Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-				// if(authentication == null) {
-				// 	log.debug("The authentication is null.");
-				// 	throw new Exception();
-				// }
-
-				// boolean isAuthenticated = authentication.isAuthenticated();
-
-				// if(!isAuthenticated) {
-				// 	log.debug("You are not authenticated.");
-				// 	throw new Exception();
-				// }
-
 				String tokenHeader = request.getHeader("Authorization");
 				String jwtToken = null;
 				
@@ -84,58 +71,50 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				Jws<Claims> jws = (Jws<Claims>)isValidAndJws.get("jws");
 				Boolean isJwtValid = (Boolean)isValidAndJws.get("isValid");
 
-				if(isJwtValid != null && isJwtValid == true) {
+				if(isJwtValid != null && isJwtValid == true) { // 유효한 토큰
 					log.debug("doFilterInternal - The JWT is vaild.");
 					Authentication auth = memberService.getAuth((String)(jws.getBody().get("username")));
 					if(auth != null) {
-						SecurityContextHolder.getContext().setAuthentication(auth);
+						SecurityContextHolder.getContext().setAuthentication(auth); // Spring Security의 세션에 로그인 처리(권한 체크 때문에 필요함)
 					} else {
 						throw new JwtException("No such account!");
 					}
-				} else {
-					if(isJwtValid != null && isJwtValid == false) {
-						throw new IllegalArgumentException();
-					} else {
-						String refreshToken = request.getHeader("Refresh-token");
+				} else { // null(계정 없음) / false(유효하지 않은 토큰)
+					String refreshToken = request.getHeader("Refresh-token");
 
-						if(refreshToken != null) {
-							Map<String, Object> isRtValidAndJws = jwtUtil.isValid(refreshToken, REFRESH_TOKEN_SECRET, "RT:");
-							
-							@SuppressWarnings("unchecked")
-							Jws<Claims> rtJws = (Jws<Claims>)isRtValidAndJws.get("jws");
-							Boolean isRtValid = (Boolean)isRtValidAndJws.get("isValid");
+					if(refreshToken != null) { // Refresh token으로 JWT 재발급
+						Map<String, Object> isRtValidAndJws = jwtUtil.isValid(refreshToken, REFRESH_TOKEN_SECRET, "RT:");
+						
+						@SuppressWarnings("unchecked")
+						Jws<Claims> rtJws = (Jws<Claims>)isRtValidAndJws.get("jws");
+						Boolean isRtValid = (Boolean)isRtValidAndJws.get("isValid");
 
-							if(isRtValid != null && isRtValid == true) {
-								Map<String, Object> result = memberService.refreshToken(refreshToken);
-								String status = (String)(result.get("status"));
+						if(isRtValid != null && isRtValid == true) {
+							Map<String, Object> result = memberService.refreshToken(refreshToken);
+							String status = (String)(result.get("status"));
 
-								if(status.contentEquals("success")) {
-									Authentication newAuth = memberService.getAuth((String)rtJws.getBody().get("username"));
+							if(status.contentEquals("success")) {
+								Authentication newAuth = memberService.getAuth((String)rtJws.getBody().get("username"));
 
-									if(newAuth != null) {
-										SecurityContextHolder.getContext().setAuthentication(newAuth);
+								if(newAuth != null) {
+									SecurityContextHolder.getContext().setAuthentication(newAuth); // Spring Security의 세션에 로그인 처리(권한 체크 때문에 필요함)
 
-										HttpSession session = request.getSession();
+									HttpSession session = request.getSession();
 
-										@SuppressWarnings("unchecked")
-										Map<String, Object> data = (Map<String, Object>)result.get("data");
+									@SuppressWarnings("unchecked")
+									Map<String, Object> newTokens = (Map<String, Object>)result.get("newTokens");
 
-										session.setAttribute("newTokens", data); // 새 토큰을 세션에 기억(JsonResponse에서 참조)
-									} else {
-										new SecurityContextLogoutHandler().logout(request, response, null);
-										throw new JwtException("No such account!");
-									}
+									session.setAttribute("newTokens", newTokens); // 새 토큰을 Spring Framework 세션에 임시 기억(JsonResponse에서 참조)
+								} else { // newAuth 가 null인 특수한 상황
+									new SecurityContextLogoutHandler().logout(request, response, null);
+									throw new JwtException("No such account!");
 								}
+							} else {
+								throw new ExpiredJwtException(null, null, null);
 							}
 						}
-
-						throw new ExpiredJwtException(null, null, null);
-					}
+					}				
 				}
-			} catch(IllegalArgumentException e) {
-				log.error("doFilterInternal - IllegalArgumentException");
-				e.printStackTrace();
-				request.setAttribute("exception", ErrorCodes.INVALID_TOKEN);
 			} catch(ExpiredJwtException e) {
 				log.error("doFilterInternal - ExpiredJwtException");
 				e.printStackTrace();

@@ -29,12 +29,13 @@ public class JsonResponse {
 
             Object newTokensObj = ses.getAttribute("newTokens");
 
+            // JwtAuthenticationFilter나 MemberController.refreshToken(...)에서 넘어온 새 JWT 정보가 있으면 JSON에 추가
             if(newTokensObj != null) {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> newTokens = (Map<String, Object>)newTokensObj;
                 this.newTokens = newTokens;
 
-                ses.removeAttribute("newTokens");
+                ses.removeAttribute("newTokens"); // 세션에서 임시 값 제거
             }
         }
 
