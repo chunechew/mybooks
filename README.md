@@ -1,5 +1,33 @@
 # mybooks
-개인용 도서 관리 프로그램. React.js +  Next.js 프론트엔드(BFF 포함)에 Java + Spring Boot + Gradle + JPA + MySQL 백엔드 적용.
+개인용 도서 관리 프로그램(개발 중).
+
+## Specification
+### 공통
+* JWT
+* Git
+
+### Frontend (incl. Backend for Frontend)
+* React.js
+* Next.js
+* Express.js (Cache 처리 한정)
+* Typescript
+* styled-components
+* React-query
+* Axios
+* Material UI
+등
+
+### Backend
+* Java 17
+* Spring Boot
+* Spring Security
+* Gradle
+* JPA
+* Lombok
+* MySQL (production)
+* H2 (development)
+* Redis (로그인 처리용)
+등
 
 ## 경로 메모
 Next.js 소스는 `src/main/ui/my-app`에 있음.
