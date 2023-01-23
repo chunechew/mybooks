@@ -21,6 +21,12 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
         log.debug("log: exception: {} ", exception);
 
+        if(exception == null) {
+            errorCode = ErrorCodes.UNKNOWN_ERROR;
+            setResponse(response, errorCode);
+            return;
+        }
+
         /**
          * 토큰 없는 경우
          */

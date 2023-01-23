@@ -11,6 +11,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import co.hanbin.mybooks.member.enumerate.MemberRole;
 
@@ -35,6 +37,16 @@ public class SecurityConfig {
 		return new JwtAuthenticationFilter();
 	}
 
+	@Bean
+	public WebMvcConfigurer corsConfigurer() {
+		return new WebMvcConfigurer() {
+			@Override
+			public void addCorsMappings(CorsRegistry registry) {
+				registry.addMapping("/**").allowedOriginPatterns("**");
+			}
+		};
+	}
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		String[] profilesArray = environment.getActiveProfiles();
@@ -47,7 +59,7 @@ public class SecurityConfig {
 				.headers().frameOptions().disable(); // H2 콘솔 화면에서 프레임을 사용하기 위해 허용
 		}
 
-		http.cors().and().csrf().disable()
+		http.cors().disable().csrf().disable()
 				.formLogin().disable().logout().invalidateHttpSession(true).clearAuthentication(true).permitAll().and()
 				.authorizeRequests()
 					.antMatchers("/favicon.ico", "/error", API_DIRECTORY_EXCEPTION + "**").permitAll()

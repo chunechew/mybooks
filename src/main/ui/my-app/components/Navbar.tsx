@@ -33,21 +33,16 @@ export default function Navbar(): ReactElement {
                 isNavExpanded ? "navigation-menu expanded" : "navigation-menu"
             }>
                 <ul>
-                <li>
-                    <Link href="/">
-                        Home
-                    </Link>
-                </li>
-                <li>
-                    <Link href="/about">
-                        About
-                    </Link>
-                </li>
-                <li>
-                    <Link href="/contact">
-                        Contact
-                    </Link>
-                </li>
+                    <li>
+                        <Link href="/">
+                            Home
+                        </Link>
+                    </li>
+                    <li>
+                        <Link href="/login">
+                            로그인
+                        </Link>
+                    </li>
                 </ul>
             </div>
         </nav>
