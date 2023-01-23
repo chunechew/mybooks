@@ -1,9 +1,6 @@
 package co.hanbin.mybooks.config.security;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
-import java.util.Date;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -12,40 +9,29 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import co.hanbin.mybooks.member.repository.PrincipalDetails;
-import co.hanbin.mybooks.member.service.MemberService;
-import co.hanbin.mybooks.member.service.SaltUtil;
+import co.hanbin.mybooks.member.component.JwtUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class JwtAuthenticationFilter extends /*BasicAuthenticationFilter*/OncePerRequestFilter {
-
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	@Value("${jwt.access-token-secret}")
 	private String SECRET_KEY;
 
-	@Value("${password-salt}")
-    private String PASSWORD_SALT;
-
-	@Autowired
-    private SaltUtil saltUtil;
-
 	@Autowired
 	private SecurityConfig securityConfig;
-	
+
 	@Autowired
-	private MemberService memberService;
+	private JwtUtil jwtUtil;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -57,6 +43,20 @@ public class JwtAuthenticationFilter extends /*BasicAuthenticationFilter*/OncePe
 			log.debug("doFilterInternal - try");
 			
 			try {
+				Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+				if(authentication == null) {
+					log.debug("The authentication is null.");
+					throw new Exception();
+				}
+
+				boolean isAuthenticated = authentication.isAuthenticated();
+
+				if(!isAuthenticated) {
+					log.debug("You are not authenticated.");
+					throw new Exception();
+				}
+
 				String tokenHeader = request.getHeader("Authorization");
 				String jwtToken = null;
 				
@@ -69,19 +69,19 @@ public class JwtAuthenticationFilter extends /*BasicAuthenticationFilter*/OncePe
 
 				log.debug("doFilterInternal - jwtToken: " + jwtToken);
 
-				Jws<Claims> jws = getJws(jwtToken, SECRET_KEY);
-				Boolean isJwtValid = isValid(jws);
+				Jws<Claims> jws = jwtUtil.getJws(jwtToken, SECRET_KEY);
+				Boolean isJwtValid = jwtUtil.isValid(jws);
 			
-				if(jwtToken != null && isJwtValid == true) {
+				if(isJwtValid != null && isJwtValid == true) {
 					log.debug("doFilterInternal - The JWT is vaild.");
-					Authentication auth = getAuth((String)(jws.getBody().get("username")));
+					Authentication auth = jwtUtil.getAuth((String)(jws.getBody().get("username")));
 					if(auth != null) {
 						SecurityContextHolder.getContext().setAuthentication(auth);
 					} else {
 						throw new JwtException("No such account!");
 					}
 				} else {
-					if(isJwtValid == false) {
+					if(isJwtValid != null && isJwtValid == false) {
 						throw new IllegalArgumentException();
 					} else {
 						throw new ExpiredJwtException(null, null, null);
@@ -107,48 +107,5 @@ public class JwtAuthenticationFilter extends /*BasicAuthenticationFilter*/OncePe
 		}
 		
 		chain.doFilter(request, response);
-	}
-
-	private Authentication getAuth(String username) {
-		log.debug("getAuth - process");
-		Authentication auth = null;
-		PrincipalDetails user = (PrincipalDetails)memberService.loadUserByUsername(username);
-
-		log.debug("getAuth > user: " + user.getUsername() + ", " + user.getPassword() + ", " + user.getAuthorities());
-		
-		if(user != null && user.getUsername() != null) {
-			final String ENCODED_PASSWORD = saltUtil.encodePassword(PASSWORD_SALT, user.getPassword());
-			auth = new UsernamePasswordAuthenticationToken(user.getUsername(), ENCODED_PASSWORD, user.getAuthorities());
-		}
-		
-		return auth;
-	}
-
-	private Jws<Claims> getJws(String jwtToken, String secretKey) {
-		Jws<Claims> jws = Jwts.parserBuilder()
-							.setSigningKey(getSecretKey(secretKey))
-							.build()
-							.parseClaimsJws(jwtToken);
-		
-		return jws;
-}
-	
-	private Boolean isValid(Jws<Claims> jws) {
-		Boolean ret = true;
-		
-		if(jws == null ||
-			jws.getBody().get("username") == null ||
-			jws.getBody().get("role") == null) {
-			ret = false;
-		} else if(jws.getBody().getExpiration().before(new Date())) {
-			ret = null;
-		}
-
-		return ret;
-	}
-	
-	private Key getSecretKey(String secretKey) {
-		byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
-		return Keys.hmacShaKeyFor(keyBytes);
 	}
 }
