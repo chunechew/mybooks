@@ -33,6 +33,8 @@ public class JsonResponse {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> newTokens = (Map<String, Object>)newTokensObj;
                 this.newTokens = newTokens;
+
+                ses.removeAttribute("newTokens");
             }
         }
 
