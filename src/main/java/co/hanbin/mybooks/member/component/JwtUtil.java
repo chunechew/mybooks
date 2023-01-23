@@ -7,26 +7,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import co.hanbin.mybooks.member.repository.PrincipalDetails;
-import co.hanbin.mybooks.member.service.MemberService;
+import co.hanbin.mybooks.db.service.RedisUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Component
 public class JwtUtil {
     @Autowired
-	private MemberService memberService;
+    private RedisUtil redisUtil;
 
     private Key getSigningKey(String secretKey) {
         byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
@@ -71,21 +66,7 @@ public class JwtUtil {
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token, secretKey));
     }
 
-    public Authentication getAuth(String username) {
-		log.debug("getAuth - process");
-		Authentication auth = null;
-		PrincipalDetails user = (PrincipalDetails)memberService.loadUserByUsername(username);
-
-		log.debug("getAuth > user: " + user.getUsername() + ", " + user.getPassword() + ", " + user.getAuthorities());
-		
-		if(user != null && user.getUsername() != null) {
-			auth = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), user.getAuthorities());
-		}
-		
-		return auth;
-	}
-
-	public Jws<Claims> getJws(String jwtToken, String secretKey) {
+    public Jws<Claims> getJws(String jwtToken, String secretKey) {
 		Jws<Claims> jws = Jwts.parserBuilder()
 							.setSigningKey(getSecretKey(secretKey))
 							.build()
@@ -94,18 +75,28 @@ public class JwtUtil {
 		return jws;
 	}
 	
-	public Boolean isValid(Jws<Claims> jws) {
-		Boolean ret = true;
-		
-		if(jws == null ||
+	public Map<String, Object> isValid(String jwtToken, String secretKey, String prefix) {
+        Jws<Claims> jws = getJws(jwtToken, secretKey);
+        Boolean isValid = true;
+        
+        if(jws == null ||
 			jws.getBody().get("username") == null ||
 			jws.getBody().get("role") == null) {
-			ret = false;
+            isValid = false;
 		} else if(jws.getBody().getExpiration().before(new Date())) {
-			ret = null;
-		}
+			isValid = null;
+		} else {
+            String cachedToken = (String)(redisUtil.getData(prefix + jws.getBody().get("username")));
+            if(!cachedToken.contentEquals(jwtToken)) {
+                isValid = null;
+            }
+        }
 
-		return ret;
+        Map<String, Object> result = new HashMap<>();
+        result.put("isValid", isValid);
+        result.put("jws", jws);
+
+		return result;
 	}
 	
 	public Key getSecretKey(String secretKey) {
