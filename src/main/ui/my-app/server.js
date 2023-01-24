@@ -5,7 +5,9 @@ const lruCache = require('lru-cache');
 
 const ssrCache = new lruCache({
     max: 100,
-    maxAge: 1000 * 60,
+    options: {
+        ttl: 1000 * 60,
+    },
 });
 
 const port = 3000;
