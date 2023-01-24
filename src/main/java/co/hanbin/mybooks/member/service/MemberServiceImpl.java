@@ -107,6 +107,9 @@ public class MemberServiceImpl implements MemberService {
                 newTokens.put("accessTokenExpire", current + ACCESS_TOKEN_EXPIRE);
                 newTokens.put("refreshToken", refreshToken);
                 newTokens.put("refreshTokenExpire", current + REFRESH_TOKEN_EXPIRE);
+                newTokens.put("username", member.getUsername());
+                newTokens.put("email", member.getEmail());
+                newTokens.put("role", member.getRole().name());
 
                 session.setAttribute("newTokens", newTokens); // 새 토큰을 Spring Framework 세션에 임시 기억(JsonResponse에서 참조)
             }
