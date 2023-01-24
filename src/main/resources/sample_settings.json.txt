@@ -1,0 +1,9 @@
+// .vscode/settings.json 으로 저장
+{
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.compile.nullAnalysis.mode": "automatic",
+    "git.ignoreLimitWarning": true,
+    "eslint.workingDirectories": [
+        "./src/main/ui/my-app"
+    ]
+}
