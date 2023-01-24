@@ -53,7 +53,7 @@ VSCode 창 닫았다 다시 열고 좌측 실행 및 디버그 버튼 누르고 
 #### Next.js
 VScode 터미널 
 > cd src/main/ui/my-app
-> npm install -- force
+> npm install --force
 
 만약에 npm 버전이 안 맞으면 `nvm` 설치 후 기본 버전으로 변경 후 `npm install` 하면 됨.
 > nvm install 18.12.0
