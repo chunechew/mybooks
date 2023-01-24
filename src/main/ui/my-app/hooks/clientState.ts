@@ -5,8 +5,12 @@ export const useSetClientState = (key: string) => {
   return (state: any) => queryClient.setQueryData(key, state);
 };
 
-export const useClientValue = (key: string, initialData: any) =>
-  useQuery(key, {
+export const useClientValue = (key: string, initialData: any) => {
+  const options = {
     initialData,
     staleTime: Infinity,
-  }).data;
+    keepPreviousData: true,
+  };
+  
+  return useQuery(key, options).data;
+};

@@ -1,19 +1,24 @@
 import axios from 'axios';
 import React, {useRef} from 'react';
 import {useSetClientState, useClientValue} from '../hooks/clientState';
-import {QueryOptions} from 'react-query';
+import {QueryOptions, useQueryClient} from 'react-query';
 
 const Login = () => {
+  const queryClient = useQueryClient();
+
   useClientValue('username', '');
   useClientValue('password', '');
   useClientValue("loading", '');
-  useClientValue("accessToken", "");
-  useClientValue("refreshToken", "");
+  useClientValue("tokens", {
+    accessToken: "",
+    accessTokenExpire: "",
+    refreshToken: "",
+    refreshTokenExpire: "",
+  });
 
   const setUsernameClientState = useSetClientState('username');
   const setPasswordClientState = useSetClientState('password');
-  const setAccessTokenState = useSetClientState('accessToken');
-  const setRefreshTokenState = useSetClientState('refreshToken');
+  const setTokensState = useSetClientState('tokens');
 
   const usernameInput = useRef(null);
   const passwordInput = useRef(null);
@@ -45,8 +50,8 @@ const Login = () => {
     await login(username, password, {})
       .then((response) => {
         changeText(loadingText.current, `${successState}: ${JSON.stringify(response)}`);
-        setAccessTokenState(response.data.accessToken);
-        setRefreshTokenState(response.data.refreshToken);
+        setTokensState(response.newTokens);
+        // console.log(queryClient.getQueryData("tokens"));
       })
       .catch((error) => {
         console.error(error);
