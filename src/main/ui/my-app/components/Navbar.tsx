@@ -1,8 +1,35 @@
 import Link from "next/link";
-import { ReactElement, useState } from "react";
+import { GetServerSideProps } from "next/types";
+import { ReactElement, useEffect, useState } from "react";
+import Cookies from "universal-cookie";
+import { useClientValue, useSetClientState } from '../hooks/clientState';
+import { useQueryClient } from "react-query";
 
 export default function Navbar(): ReactElement {
     const [isNavExpanded, setIsNavExpanded] = useState(false);
+    const queryClient = useQueryClient();
+    const setLoggedInState = useSetClientState('loggedIn');
+    let isLoggedIn = false;
+
+    const cookies = new Cookies();
+    const userInfo = cookies.get("userInfo");
+
+    console.log("userInfo: ", userInfo);
+
+    if(userInfo) {
+        isLoggedIn = true;
+    }
+
+    // React hook의 사용 위치 제한 우회용 코드
+    const useUpdate = (isLoggedIn: boolean) => {
+        useEffect(() => {
+            setLoggedInState(isLoggedIn);
+        });
+
+        return { loggedIn: isLoggedIn, setLoggedIn: setLoggedInState };
+    }
+
+    const {loggedIn} = useUpdate(isLoggedIn);
 
     return (
         <nav className="navigation">
@@ -39,9 +66,15 @@ export default function Navbar(): ReactElement {
                         </Link>
                     </li>
                     <li>
+                        { loggedIn ?
+                        <Link href="/login">
+                            로그아웃
+                        </Link>
+                        :
                         <Link href="/login">
                             로그인
                         </Link>
+                        }
                     </li>
                 </ul>
             </div>

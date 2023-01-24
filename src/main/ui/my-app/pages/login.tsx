@@ -1,28 +1,46 @@
 import axios from 'axios';
-import React, {useRef} from 'react';
-import {useSetClientState, useClientValue} from '../hooks/clientState';
-import {QueryOptions, useQueryClient} from 'react-query';
+import React, { useEffect, useRef } from 'react';
+import { QueryOptions, useQueryClient } from 'react-query';
+import { useClientValue, useSetClientState } from '../hooks/clientState';
+import Cookies from 'universal-cookie';
 
 const Login = () => {
   const queryClient = useQueryClient();
+  let isLoggedIn = queryClient.getQueryData("loggedIn") as boolean || false;
 
   useClientValue('username', '');
   useClientValue('password', '');
-  useClientValue("loading", '');
-  useClientValue("tokens", {
+  useClientValue('loading', '');
+  useClientValue("userInfo", {
     accessToken: "",
     accessTokenExpire: "",
     refreshToken: "",
     refreshTokenExpire: "",
+    username: "",
+    email: "",
+    role: "",
   });
+  useClientValue("loggedIn", false);
 
   const setUsernameClientState = useSetClientState('username');
   const setPasswordClientState = useSetClientState('password');
-  const setTokensState = useSetClientState('tokens');
+  const setUserInfoState = useSetClientState('userInfo');
+  const setLoggedInState = useSetClientState('loggedIn');
 
   const usernameInput = useRef(null);
   const passwordInput = useRef(null);
   const loadingText = useRef(null);
+
+  // React hook의 사용 위치 제한 우회용 코드
+  const useUpdate = (isLoggedIn: boolean) => {
+    useEffect(() => {
+      setLoggedInState(isLoggedIn);
+    });
+
+    return { setLoggedIn: setLoggedInState };
+  }
+
+  const {setLoggedIn} = useUpdate(isLoggedIn);
 
   const onUsernameHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUsernameClientState(e.currentTarget.value);
@@ -38,9 +56,6 @@ const Login = () => {
     const username = currUsername?.value || "";
     const password = currPassword?.value || "";
   
-    console.log('Username', username);
-    console.log('Password', password);
-  
     const loadingState = "로딩 중";
     const successState = "로그인 성공";
     const failedState = "로그인 실패";
@@ -48,15 +63,28 @@ const Login = () => {
     changeText(loadingText.current, loadingState);
 
     await login(username, password, {})
-      .then((response) => {
+      .then(/*async*/ (response) => {
         changeText(loadingText.current, `${successState}: ${JSON.stringify(response)}`);
-        setTokensState(response.newTokens);
-        // console.log(queryClient.getQueryData("tokens"));
+        setUserInfoState(response.newTokens);
+        
+        const cookies = new Cookies();
+
+        cookies.set("userInfo", response.newTokens, {
+          maxAge: Number(((response.newTokens.refreshTokenExpire - new Date().getTime()) / 1000).toFixed(0))
+        });
+
+        console.log(cookies.getAll());
+
+        isLoggedIn = true;
+
+        // await sendCookie(response.newTokens);
       })
       .catch((error) => {
         console.error(error);
         changeText(loadingText.current, `${failedState}: ${JSON.stringify(error)}`);
       });
+
+      setLoggedIn(isLoggedIn);
   };
 
   const changeText = (curr: any, stateText: string) => {
@@ -83,6 +111,25 @@ const Login = () => {
 
     return response;
   };
+
+  // 서버 사이드에도 쿠키 저장 요청
+  /*const sendCookie = async(object: object) => {
+    const url = `${process.env.NEXT_PUBLIC_NEXT_API_GATEWAY}/setCookieOnServer`;
+
+    console.log(process.env, process.env.NEXT_PUBLIC_NEXT_API_GATEWAY, process.env.NODE_ENV);
+    
+    const data = {
+      object 
+    };
+  
+    const response = await axios({
+      method: 'post',
+      url: url,
+      data: data,
+    }).then((res) => res.data);
+
+    return response;
+  }*/
 
   return (
     <>

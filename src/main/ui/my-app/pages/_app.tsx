@@ -1,9 +1,11 @@
-import Head from 'next/head';
 import { AppProps } from 'next/app';
-import { ReactQueryDevtools } from 'react-query/devtools';
+import Head from 'next/head';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import Navbar from "../components/Navbar";
+import { ReactQueryDevtools } from 'react-query/devtools';
 import "styles/styles.css";
+import Navbar from "../components/Navbar";
+import { GetServerSideProps } from 'next';
+import Cookies from 'universal-cookie';
 
 const client = new QueryClient({
     defaultOptions: {
