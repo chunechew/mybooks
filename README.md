@@ -38,6 +38,7 @@
 * MySQL (운영 전용)
 * H2 (개발 전용)
 * Redis (로그인 처리용)
+* Swagger
 * QueryDSL (사용 여부 미정)
 
 ## 경로 메모
