@@ -34,8 +34,6 @@ export const authOptions = {
 
           const resJson: any = await res.json();
 
-          console.log("resJson:", resJson);
-
           const user = resJson.newTokens;
     
           // If no error and we have user data, return it
@@ -53,28 +51,26 @@ export const authOptions = {
   },
   callbacks: {
     async jwt({ token, user, account }: any) {
-      if (/*account &&*/ user) {
-        // return {
-        //   ...token,
-        //   accessToken: user.token,
-        //   refreshToken: user.refreshToken,
-        // };
-        return user;
+      if (account && user) {
+        return {
+          ...token,
+          ...user,
+        }; // session({session, token}) 함수의 token 자리에 들어감
       }
 
-      return null;//token;
+      return token;
     },
 
     async session({ session, token }: any) {
-      session.user = Object.assign(token);
+      session.user = token;
 
       return session;
     },
   },
   theme: {
-    colorScheme: 'auto', // "auto" | "dark" | "light"
-    brandColor: '', // Hex color code #33FF5D
-    // logo: '/logo.png', // Absolute URL to image
+    colorScheme: 'light', // "auto" | "dark" | "light"
+    brandColor: '#33FF5D', // Hex color code #33FF5D
+    logo: '',// '/logo.png', // Absolute URL to image
   },
   // Enable debug messages in the console if you are having problems
   debug: process.env.NODE_ENV === 'development',
