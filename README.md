@@ -18,11 +18,15 @@
 * Styled-Components (사용 예정)
 * Tailwind CSS
 * tailwind-styled-components (Tailwind CSS에 Styled-Components를 얹은 패키지)
+* heroicons
+
 등
 
 ### Backend
 * Java 17
 * Spring Boot
+* Apache
+* Tomcat
 * Spring Security
 * Gradle
 * JPA
@@ -31,6 +35,7 @@
 * MySQL (운영 전용)
 * H2 (개발 전용)
 * Redis (개발/운영 모두. 로그인 처리용)
+
 등
 
 ## 경로 메모

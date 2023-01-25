@@ -1,18 +1,10 @@
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useState } from "react";
 
 export default function Navbar(): ReactElement {
     const [isNavExpanded, setIsNavExpanded] = useState(false);
-    // const setLoggedInState = useSetClientState('loggedIn');
-
-    // // React hook의 사용 위치 제한 우회용 코드
-    // const useUpdate = (isLoggedIn: boolean) => {
-    //     useEffect(() => {
-    //         setLoggedInState(isLoggedIn);
-    //     });
-
-    //     return { loggedIn: isLoggedIn, setLoggedIn: setLoggedInState };
-    // }
+    const {data: session} = useSession();
 
     return (
         <nav className="navigation">
@@ -49,9 +41,15 @@ export default function Navbar(): ReactElement {
                         </Link>
                     </li>
                     <li>
-                        <Link href="/login">
-                            로그인
-                        </Link>
+                        { session ?
+                          <Link href={""} onClick={() => signOut()}>
+                            로그아웃
+                          </Link>
+                          :
+                          <Link href="/login">
+                              로그인
+                          </Link>
+                        }
                     </li>
                 </ul>
             </div>

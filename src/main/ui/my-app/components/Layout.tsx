@@ -1,4 +1,4 @@
-import NavBar from "./NavBar";
+import Navbar from "./Navbar";
 
 type Props = {
   children: React.ReactNode;
@@ -7,7 +7,7 @@ type Props = {
 export default function Layout(props: Props) {
   return (
     <div className="w-full p-0">
-      <NavBar />
+      <Navbar />
       {props.children}
     </div>
   );
