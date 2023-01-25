@@ -6,19 +6,27 @@
 * JWT
 * GitHub
 * Jenkins (사용 예정)
+* REST API
+* Linux (운영 전용. Backend 및 Backend for Frontend 서버용. 사용 예정)
+* AWS (운영 전용. Backend 및 Backend for Frontend 서버용. 사용 예정)
+* macOS (개발 전용)
+* VS Code (IDE)
 
 ### Frontend (incl. Backend for Frontend)
 * React.js
 * Next.js
-* Express.js (Cache 처리 한정)
+* Node.js + Express.js (Cache 처리 한정)
+* ES6+
 * Typescript
+* Webpack
+* Babel
 * NextAuth
 * React Query
 * Axios
 * Styled-Components (사용 예정)
 * Tailwind CSS
 * tailwind-styled-components (Tailwind CSS에 Styled-Components를 얹은 패키지)
-* heroicons
+* Heroicons
 
 등
 
@@ -30,11 +38,27 @@
 * Spring Security
 * Gradle
 * JPA
-* Query DSL (사용 여부 미정)
 * Lombok
 * MySQL (운영 전용)
 * H2 (개발 전용)
-* Redis (개발/운영 모두. 로그인 처리용)
+* Redis (로그인 처리용)
+
+등
+
+### 모바일 확장 계획(구상 중. 중기 계획)
+* React Native
+* SQLite(로컬 DB)
+
+등
+
+### 고도화 계획(구상 중. 장기 계획)
+* QueryDSL
+* PostgreSQL(메인 DB 교체)
+* Redis(타 DB 데이터 캐싱 용도로도 활용)
+* ElasticSearch(텍스트 검색용)
+* WebFlux(전환)
+* MSA(전환)
+* Kafka 또는 RabbitMQ
 
 등
 
