@@ -4,7 +4,8 @@
 ## Specification
 ### 공통
 * JWT
-* Git
+* GitHub
+* Jenkins (사용 예정)
 
 ### Frontend (incl. Backend for Frontend)
 * React.js
@@ -12,10 +13,11 @@
 * Express.js (Cache 처리 한정)
 * Typescript
 * NextAuth
-* styled-components
-* React-query
+* React Query
 * Axios
-* Material UI
+* Styled-Components
+* Tailwind CSS
+* tailwind-styled-components
 등
 
 ### Backend
@@ -25,9 +27,9 @@
 * Gradle
 * JPA
 * Lombok
-* MySQL (production)
-* H2 (development)
-* Redis (로그인 처리용)
+* MySQL (운영 전용)
+* H2 (개발 전용)
+* Redis (개발/운영 모두. 로그인 처리용)
 등
 
 ## 경로 메모
