@@ -15,9 +15,9 @@
 * NextAuth
 * React Query
 * Axios
-* Styled-Components
+* Styled-Components (사용 예정)
 * Tailwind CSS
-* tailwind-styled-components
+* tailwind-styled-components (Tailwind CSS에 Styled-Components를 얹은 패키지)
 등
 
 ### Backend
@@ -26,6 +26,7 @@
 * Spring Security
 * Gradle
 * JPA
+* Query DSL (사용 여부 미정)
 * Lombok
 * MySQL (운영 전용)
 * H2 (개발 전용)
