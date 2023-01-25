@@ -6,11 +6,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import co.hanbin.mybooks.db.service.RedisUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
@@ -20,8 +18,8 @@ import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JwtUtil {
-    @Autowired
-    private RedisUtil redisUtil;
+    // @Autowired
+    // private RedisUtil redisUtil;
 
     private Key getSigningKey(String secretKey) {
         byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
@@ -86,10 +84,10 @@ public class JwtUtil {
 		} else if(jws.getBody().getExpiration().before(new Date())) {
 			isValid = null;
 		} else {
-            String cachedToken = (String)(redisUtil.getData(prefix + jws.getBody().get("username")));
-            if(!cachedToken.contentEquals(jwtToken)) {
+            // String cachedToken = (String)(redisUtil.getData(prefix + jws.getBody().get("username")));
+            // if(!cachedToken.contentEquals(jwtToken)) {
                 isValid = null;
-            }
+            // }
         }
 
         Map<String, Object> result = new HashMap<>();
