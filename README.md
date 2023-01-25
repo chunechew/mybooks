@@ -1,5 +1,5 @@
 # mybooks
-개인용 도서 관리 프로그램(개발 중).
+개인용 도서 관리 프로그램(혼자 실습용으로 FE, BE 모두 개발 중).
 
 ## Specification
 ### 공통
@@ -28,8 +28,6 @@
 * tailwind-styled-components (Tailwind CSS에 Styled-Components를 얹은 패키지)
 * Heroicons
 
-등
-
 ### Backend
 * Java 17
 * Spring Boot
@@ -43,15 +41,12 @@
 * H2 (개발 전용)
 * Redis (로그인 처리용)
 
-등
-
-### 모바일 확장 계획(구상 중. 중기 계획)
+### 모바일 앱 개발 구상 중(미정. 중기 계획)
 * React Native
 * SQLite(로컬 DB)
+* 약간의 native 개발도? (Swift, Kotlin)
 
-등
-
-### 고도화 계획(구상 중. 장기 계획)
+### 고도화 구상 중(미정. 장기 계획)
 * QueryDSL
 * PostgreSQL(메인 DB 교체)
 * Redis(타 DB 데이터 캐싱 용도로도 활용)
@@ -59,8 +54,9 @@
 * WebFlux(전환)
 * MSA(전환)
 * Kafka 또는 RabbitMQ
-
-등
+* REST API에서 GraphQL로 전환
+* Axios 대신 Apollo Client 도입
+* Preact
 
 ## 경로 메모
 Next.js 소스는 `src/main/ui/my-app`에 있음.
