@@ -35,6 +35,9 @@ Next.js 소스는 `src/main/ui/my-app`에 있음.
 ​
 ## 설정 방법
 ### macOS + VScode
+#### DB
+홈브루 설치하고 Redis(개발, 운영 모두 해당), MySQL(운영 전용) 설치. H2(개발 전용)는 스프링 내장 DB 사용.
+
 #### Java
 홈브루 설치하고 터미널에서 아래 실행.
 > brew install openjdk@17

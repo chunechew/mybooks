@@ -11,8 +11,8 @@ export const authOptions = {
         // e.g. domain, username, password, 2FA token, etc.
         // You can pass any HTML attribute to the <input> tag through the object.
         credentials: {
-          username: { label: "Username", type: "text", placeholder: "jsmith" },
-          password: { label: "Password", type: "password" },
+          username: { label: "username", type: "text", placeholder: "jsmith" },
+          password: { label: "password", type: "password" },
         },
         async authorize(credentials, req) {
           // You need to provide your own logic here that takes the credentials
@@ -21,16 +21,22 @@ export const authOptions = {
           // e.g. return { id: 1, name: 'J Smith', email: 'jsmith@example.com' }
           // You can also use the `req` object to obtain additional parameters
           // (i.e., the request IP address)
+          const body = JSON.stringify({
+            username: credentials?.username || "",
+            password: credentials?.password || "",
+          });
+          
           const res = await fetch(`${process.env.NEXT_PUBLIC_API_GATEWAY}/member/login`, {
             method: 'POST',
-            body: {
-                username: credentials?.username || "",
-                password: credentials?.password || "",
-            } as any,
+            body,
             headers: { "Content-Type": "application/json" }
           });
 
-          const user = await res.json();
+          const resJson: any = await res.json();
+
+          console.log("resJson:", resJson);
+
+          const user = resJson.newTokens;
     
           // If no error and we have user data, return it
           if (res.ok && user) {
@@ -41,6 +47,37 @@ export const authOptions = {
         }
     }),
   ],
+  secret: process.env.JWT_SECRET,
+  pages: {
+    signIn: '/login',
+  },
+  callbacks: {
+    async jwt({ token, user, account }: any) {
+      if (/*account &&*/ user) {
+        // return {
+        //   ...token,
+        //   accessToken: user.token,
+        //   refreshToken: user.refreshToken,
+        // };
+        return user;
+      }
+
+      return null;//token;
+    },
+
+    async session({ session, token }: any) {
+      session.user = Object.assign(token);
+
+      return session;
+    },
+  },
+  theme: {
+    colorScheme: 'auto', // "auto" | "dark" | "light"
+    brandColor: '', // Hex color code #33FF5D
+    // logo: '/logo.png', // Absolute URL to image
+  },
+  // Enable debug messages in the console if you are having problems
+  debug: process.env.NODE_ENV === 'development',
 };
 
-export default NextAuth(authOptions)
+export default NextAuth(authOptions as any);

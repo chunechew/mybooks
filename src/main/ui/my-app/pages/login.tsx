@@ -1,160 +1,120 @@
-import axios from 'axios';
-import React, { useEffect, useRef } from 'react';
-import { QueryOptions, useQueryClient } from 'react-query';
-import { useClientValue, useSetClientState } from '../hooks/clientState';
-import Cookies from 'universal-cookie';
+import { useState } from 'react';
+import { getCsrfToken, signIn } from 'next-auth/react';
+import { Formik, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
+import { useRouter } from 'next/router';
+import { GetServerSideProps } from 'next';
 
-const Login = () => {
-  const queryClient = useQueryClient();
-  let isLoggedIn = queryClient.getQueryData("loggedIn") as boolean || false;
+interface SignInArgs {
+  csrfToken: string,
+}
 
-  useClientValue('username', '');
-  useClientValue('password', '');
-  useClientValue('loading', '');
-  useClientValue("userInfo", {
-    accessToken: "",
-    accessTokenExpire: "",
-    refreshToken: "",
-    refreshTokenExpire: "",
-    username: "",
-    email: "",
-    role: "",
-  });
-  useClientValue("loggedIn", false);
-
-  const setUsernameClientState = useSetClientState('username');
-  const setPasswordClientState = useSetClientState('password');
-  const setUserInfoState = useSetClientState('userInfo');
-  const setLoggedInState = useSetClientState('loggedIn');
-
-  const usernameInput = useRef(null);
-  const passwordInput = useRef(null);
-  const loadingText = useRef(null);
-
-  // React hook의 사용 위치 제한 우회용 코드
-  const useUpdate = (isLoggedIn: boolean) => {
-    useEffect(() => {
-      setLoggedInState(isLoggedIn);
-    });
-
-    return { setLoggedIn: setLoggedInState };
-  }
-
-  const {setLoggedIn} = useUpdate(isLoggedIn);
-
-  const onUsernameHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUsernameClientState(e.currentTarget.value);
-  };
-  
-  const onPasswordHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPasswordClientState(e.currentTarget.value);
-  };
-  
-  const onSubmitHandler = async (e: React.SyntheticEvent, currUsername: any, currPassword: any) => {
-    e.preventDefault();
-
-    const username = currUsername?.value || "";
-    const password = currPassword?.value || "";
-  
-    const loadingState = "로딩 중";
-    const successState = "로그인 성공";
-    const failedState = "로그인 실패";
-  
-    changeText(loadingText.current, loadingState);
-
-    await login(username, password, {})
-      .then(/*async*/ (response) => {
-        changeText(loadingText.current, `${successState}: ${JSON.stringify(response)}`);
-        setUserInfoState(response.newTokens);
-        
-        const cookies = new Cookies();
-
-        cookies.set("userInfo", response.newTokens, {
-          maxAge: Number(((response.newTokens.refreshTokenExpire - new Date().getTime()) / 1000).toFixed(0))
-        });
-
-        console.log(cookies.getAll());
-
-        isLoggedIn = true;
-
-        // await sendCookie(response.newTokens);
-      })
-      .catch((error) => {
-        console.error(error);
-        changeText(loadingText.current, `${failedState}: ${JSON.stringify(error)}`);
-      });
-
-      setLoggedIn(isLoggedIn);
-  };
-
-  const changeText = (curr: any, stateText: string) => {
-    if(curr) {
-      curr.innerText = stateText;
-    }
-  };
-  
-  const login = async (username: string, password: string, options: QueryOptions) => {
-    const url = `${process.env.NEXT_PUBLIC_API_GATEWAY}/member/login`;
-
-    console.log(process.env, process.env.NEXT_PUBLIC_API_GATEWAY, process.env.NODE_ENV);
-    
-    const data = {
-      username: username,
-      password: password
-    };
-  
-    const response = await axios({
-      method: 'post',
-      url: url,
-      data: data,
-    }).then((res) => res.data);
-
-    return response;
-  };
-
-  // 서버 사이드에도 쿠키 저장 요청
-  /*const sendCookie = async(object: object) => {
-    const url = `${process.env.NEXT_PUBLIC_NEXT_API_GATEWAY}/setCookieOnServer`;
-
-    console.log(process.env, process.env.NEXT_PUBLIC_NEXT_API_GATEWAY, process.env.NODE_ENV);
-    
-    const data = {
-      object 
-    };
-  
-    const response = await axios({
-      method: 'post',
-      url: url,
-      data: data,
-    }).then((res) => res.data);
-
-    return response;
-  }*/
+export default function SignIn({ csrfToken } : SignInArgs) {
+  const router = useRouter();
+  const [error, setError] = useState(null);
 
   return (
     <>
-      <div style={{ 
-        display: 'flex', justifyContent: 'center', alignItems: 'center', 
-        width: '100%', height: 'calc(100vh - 120px)'
-      }}>
-        <form style={{ display: 'flex', flexDirection: 'column'}}
-            onSubmit={async (e) => await onSubmitHandler(e, usernameInput.current as any, passwordInput.current as any)}
-        >
-            <label>아이디</label>
-            <input type='text' ref={usernameInput} onChange={onUsernameHandler}/>
-            <label>패스워드</label>
-            <input type='password' ref={passwordInput} onChange={onPasswordHandler}/>
-            <br />
-            <button formAction=''>
-                로그인
-            </button>
-        </form>
-      </div>
-      <div style={{
-        textAlign: 'center',
-      }} ref={loadingText}></div>
+      <Formik
+        initialValues={{ username: '', password: '', tenantKey: '' }}
+        validationSchema={Yup.object({
+          username: Yup.string()
+            .max(30, '아이디는 30자 이내로 입력해 주세요.')
+            // .email('Invalid email address')
+            .required('아이디를 입력해 주세요.'),
+          password: Yup.string().required('비밀번호를 입력해 주세요.'),
+         })}
+        onSubmit={async (values: any, { setSubmitting }) => {
+          const res: any = await signIn('credentials', {
+            redirect: false,
+            username: values.username,
+            password: values.password,
+            callbackUrl: `${window.location.origin}`,
+          });
+          if (res?.error) {
+            setError(res.error);
+          } else {
+            setError(null);
+          }
+          if (res.url) router.push(res.url);
+          setSubmitting(false);
+        }}
+      >
+        {(formik) => (
+          <form onSubmit={formik.handleSubmit}>
+            <div 
+            className="bg-red-400 flex flex-col items-center 
+            justify-center min-h-screen py-2 shadow-lg">
+              <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+                <input
+                  name="csrfToken"
+                  type="hidden"
+                  defaultValue={csrfToken}
+                />
+
+                <div className="text-red-400 text-md text-center rounded p-2">
+                  {error}
+                </div>
+                <div className="mb-4">
+                  <label
+                    htmlFor="username"
+                    className="uppercase text-sm text-gray-600 font-bold"
+                  >
+                    아이디
+                    <Field
+                      name="username"
+                      aria-label="아이디를 입력해 주세요."
+                      aria-required="true"
+                      type="text"
+                      className="w-full bg-gray-300 text-gray-900 mt-2 p-3"
+                    />
+                  </label>
+
+                  <div className="text-red-600 text-sm">
+                    <ErrorMessage name="username" />
+                  </div>
+                </div>
+                <div className="mb-6">
+                  <label
+                    htmlFor="password"
+                    className="uppercase text-sm text-gray-600 font-bold"
+                  >
+                    비밀번호
+                    <Field
+                      name="password"
+                      aria-label="enter your password"
+                      aria-required="true"
+                      type="password"
+                      className="w-full bg-gray-300 text-gray-900 mt-2 p-3"
+                    />
+                  </label>
+
+                  <div className="text-red-600 text-sm">
+                    <ErrorMessage name="password" />
+                  </div>
+                </div>
+                <div className="flex items-center justify-center">
+                  <button
+                    type="submit"
+                    className="bg-green-400 text-gray-100 p-3 rounded-lg w-full"
+                  >
+                    {formik.isSubmitting ? '잠시만 기다려 주세요...' : '로그인'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        )}
+      </Formik>
     </>
   );
 }
 
-export default Login;
+// This is the recommended way for Next.js 9.3 or newer
+export async function getServerSideProps(context: any) {
+  return {
+    props: {
+      csrfToken: await getCsrfToken(context),
+    },
+  };
+}
