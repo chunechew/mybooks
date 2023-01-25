@@ -9,8 +9,6 @@
 * REST API
 * Linux (운영 전용. Backend 및 Backend for Frontend 서버용. 사용 예정)
 * AWS (운영 전용. Backend 및 Backend for Frontend 서버용. 사용 예정)
-* macOS (개발 전용)
-* VS Code (IDE)
 
 ### Frontend (incl. Backend for Frontend)
 * React.js
@@ -40,23 +38,7 @@
 * MySQL (운영 전용)
 * H2 (개발 전용)
 * Redis (로그인 처리용)
-
-### 모바일 앱 개발 구상 중(미정. 중기 계획)
-* React Native
-* SQLite(로컬 DB)
-* 약간의 native 개발도? (Swift, Kotlin)
-
-### 고도화 구상 중(미정. 장기 계획)
-* QueryDSL
-* PostgreSQL(메인 DB 교체)
-* Redis(타 DB 데이터 캐싱 용도로도 활용)
-* ElasticSearch(텍스트 검색용)
-* WebFlux(전환)
-* MSA(전환)
-* Kafka 또는 RabbitMQ
-* REST API에서 GraphQL로 전환
-* Axios 대신 Apollo Client 도입
-* Preact
+* QueryDSL (사용 여부 미정)
 
 ## 경로 메모
 Next.js 소스는 `src/main/ui/my-app`에 있음.
