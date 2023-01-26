@@ -2,18 +2,14 @@ import { useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import { MenuIcon, XIcon } from "@heroicons/react/outline";
 import Link from "next/link";
-import styled from "styled-components";
 
 const Navbar = () => {
   const [menuToggle, setMenuToggle] = useState(false);
   const {data: session} = useSession();
-  const NavWrapper = styled.nav`
-    height: 64px;
-  `;
 
   return (
     //   navbar goes here
-    <NavWrapper className="bg-gray-100">
+    <nav className="bg-gray-100">
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex justify-between">
           <div className="flex space-x-4">
@@ -94,7 +90,7 @@ const Navbar = () => {
       </div>
 
       {/* mobile menu items */}
-      <div className={`${!menuToggle ? "hidden" : ""} md:hidden`}>
+      <div className={`${!menuToggle ? "hidden" : ""} md:hidden bg-gray-50`}>
         <Link
           href="/features"
           className="block py-2 px-4 text-sm hover:bg-gray-200"
@@ -106,24 +102,24 @@ const Navbar = () => {
         </Link>
 
         { session
-        ?
-        <>
-            <Link href={""} onClick={() => signOut()} className="block py-2 px-4 text-sm hover:bg-gray-200">
-                Logout
-            </Link>
-        </>
-        :
-        <>
-            <Link href="/signup" className="block py-2 px-4 text-sm hover:bg-gray-200">
-                Signup
-            </Link>
-            <Link href="/login" className="block py-2 px-4 text-sm hover:bg-gray-200">
-                Login
-            </Link>
-        </>
+            ?
+            <>
+                <Link href={""} onClick={() => signOut()} className="block py-2 px-4 text-sm bg-yellow-400 hover:bg-yellow-300 text-yellow-900 hover:text-yellow-800">
+                    Logout
+                </Link>
+            </>
+            :
+            <>
+                <Link href="/signup" className="block py-2 px-4 text-sm hover:bg-gray-200">
+                    Signup
+                </Link>
+                <Link href="/login" className="block py-2 px-4 text-sm bg-green-400 hover:bg-green-300 text-green-900 hover:text-green-800">
+                    Login
+                </Link>
+            </>
         }
       </div>
-    </NavWrapper>
+    </nav>
   );
 };
 

@@ -7,12 +7,11 @@ const Index = () => {
     flex-col
     items-center
     justify-center
-    h-full
     py-2
   `;
 
   return (
-    <IndexWrapper>
+    <IndexWrapper className="mainWrapper">
       <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
         <h1 className="text-6xl font-bold">
           Welcome to{" "}
