@@ -1,33 +1,60 @@
 // 아래 코드 참고해서 .vscode/launch.json 으로 저장
 {
-    // IntelliSense를 사용하여 가능한 특성에 대해 알아보세요.
-    // 기존 특성에 대한 설명을 보려면 가리킵니다.
-    // 자세한 내용을 보려면 https://go.microsoft.com/fwlink/?linkid=830387을(를) 방문하세요.
     "version": "0.2.0",
     "configurations": [
-        {
-            "type": "java",
-            "name": "dev_MybooksApplication",
-            "request": "launch",
-            "mainClass": "co.hanbin.mybooks.MybooksApplication",
-            "projectName": "mybooks",
-            "args": "--spring.profiles.active=dev",
-            "vmArgs": "-Dspring.profiles.active=dev" 
-        },
-        {
-            "type": "java",
-            "name": "prod_MybooksApplication",
-            "request": "launch",
-            "mainClass": "co.hanbin.mybooks.MybooksApplication",
-            "projectName": "mybooks",
-            "args": "--spring.profiles.active=prod",
-            "vmArgs": "-Dspring.profiles.active=prod" 
-        },
         {
             "type": "java",
             "name": "Launch Current File",
             "request": "launch",
             "mainClass": "${file}"
-        }
+        },
+        {
+            "type": "java",
+            "name": "dev-java-Mybooks",
+            "request": "launch",
+            "mainClass": "co.hanbin.mybooks.MybooksApplication",
+            "projectName": "mybooks",
+            "vmArgs": "-Dspring.profiles.active=dev"
+        },
+        {
+            "type": "java",
+            "name": "prod-java-Mybooks",
+            "request": "launch",
+            "mainClass": "co.hanbin.mybooks.MybooksApplication",
+            "projectName": "mybooks",
+            "vmArgs": "-Dspring.profiles.active=prod"
+        },
+        {
+            "type": "node-terminal",
+            "name": "dev-node-MyBooks",
+            "request": "launch",
+            "command": "npx next build && NODE_ENV=development NODE_OPTIONS='--inspect' node server.js",//"npm run start",//"npx cross-env NODE_OPTIONS='--inspect' next dev"
+            "cwd": "${workspaceFolder}/src/main/ui/my-app"
+        },
+        {
+            "type": "node-terminal",
+            "name": "prod-node-MyBooks",
+            "request": "launch",
+            "command": "npx next build && NODE_ENV=production NODE_OPTIONS='--inspect' node server.js",
+            "cwd": "${workspaceFolder}/src/main/ui/my-app"
+        },
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "node-debug-attach",
+            "address": "localhost",
+            "port": 9229,
+            "sourceMaps": true
+        },
+    ],
+    "compounds": [
+        {
+            "name": "!dev-node-MyBooks",
+            "configurations": ["dev-node-MyBooks", "node-debug-attach"]
+        },
+        {
+            "name": "!prod-node-MyBooks",
+            "configurations": ["prod-node-MyBooks", "node-debug-attach"]
+        },
     ]
 }
