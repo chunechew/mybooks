@@ -2,6 +2,7 @@ import { useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import { MenuIcon, XIcon } from "@heroicons/react/outline";
 import Link from "next/link";
+import MobileMenuLink from "./MobileMenuLink";
 
 const Navbar = () => {
   const [menuToggle, setMenuToggle] = useState(false);
@@ -104,18 +105,19 @@ const Navbar = () => {
         { session
             ?
             <>
-                <Link href={""} onClick={() => signOut()} className="block py-2 px-4 text-sm bg-yellow-400 hover:bg-yellow-300 text-yellow-900 hover:text-yellow-800">
+                <MobileMenuLink href={""} onClick={() => signOut()} menuClose={setMenuToggle}
+                    className="block py-2 px-4 text-sm bg-yellow-400 hover:bg-yellow-300 text-yellow-900 hover:text-yellow-800">
                     Logout
-                </Link>
+                </MobileMenuLink>
             </>
             :
             <>
-                <Link href="/signup" className="block py-2 px-4 text-sm hover:bg-gray-200">
+                <MobileMenuLink href="/signup" menuClose={setMenuToggle} className="block py-2 px-4 text-sm hover:bg-gray-200">
                     Signup
-                </Link>
-                <Link href="/login" className="block py-2 px-4 text-sm bg-green-400 hover:bg-green-300 text-green-900 hover:text-green-800">
+                </MobileMenuLink>
+                <MobileMenuLink href="/login" menuClose={setMenuToggle} className="block py-2 px-4 text-sm bg-green-400 hover:bg-green-300 text-green-900 hover:text-green-800">
                     Login
-                </Link>
+                </MobileMenuLink>
             </>
         }
       </div>
