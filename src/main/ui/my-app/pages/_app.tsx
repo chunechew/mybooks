@@ -2,7 +2,7 @@ import { AppProps } from 'next/app';
 import Head from 'next/head';
 import { Hydrate, QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
-import "../styles/styles.css";
+import "../styles/globals.css";
 import Layout from "../components/Layout";
 import { SessionProvider } from 'next-auth/react';
 

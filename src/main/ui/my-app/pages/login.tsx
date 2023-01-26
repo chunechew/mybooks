@@ -3,7 +3,6 @@ import { getCsrfToken, signIn } from 'next-auth/react';
 import { Formik, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useRouter } from 'next/router';
-import { GetServerSideProps } from 'next';
 
 interface SignInArgs {
   csrfToken: string,
@@ -43,9 +42,9 @@ export default function SignIn({ csrfToken } : SignInArgs) {
         {(formik) => (
           <form onSubmit={formik.handleSubmit}>
             <div 
-            className="bg-red-400 flex flex-col items-center 
+            className="flex flex-col items-center 
             justify-center min-h-screen py-2 shadow-lg">
-              <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+              <div className="bg-gray-200 shadow-md rounded px-8 pt-6 pb-8 mb-4">
                 <input
                   name="csrfToken"
                   type="hidden"
@@ -66,7 +65,7 @@ export default function SignIn({ csrfToken } : SignInArgs) {
                       aria-label="아이디를 입력해 주세요."
                       aria-required="true"
                       type="text"
-                      className="w-full bg-gray-300 text-gray-900 mt-2 p-3"
+                      className="w-full text-gray-900 mt-2 p-3"
                     />
                   </label>
 
@@ -85,7 +84,7 @@ export default function SignIn({ csrfToken } : SignInArgs) {
                       aria-label="enter your password"
                       aria-required="true"
                       type="password"
-                      className="w-full bg-gray-300 text-gray-900 mt-2 p-3"
+                      className="w-full text-gray-900 mt-2 p-3"
                     />
                   </label>
 

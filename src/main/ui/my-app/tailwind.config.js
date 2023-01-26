@@ -1,11 +1,15 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./pages/**/*.{js,ts,jsx,tsx}",
-    "./components/**/*.{js,ts,jsx,tsx}"
-  ],
-  theme: {
-    extend: {},
+  purge: {
+    enabled: process.env.NODE_ENV === 'production',
+    content: [
+      "./pages/**/*.{js,ts,jsx,tsx}",
+      "./components/**/*.{js,ts,jsx,tsx}"
+    ],
+    options: {
+      safelist: [],
+    },
   },
-  plugins: [],
-}
+
+  // darkMode: `class`
+};

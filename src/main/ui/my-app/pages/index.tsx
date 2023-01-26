@@ -6,8 +6,8 @@ const Index = () => {
       <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
         <h1 className="text-6xl font-bold">
           Welcome to{" "}
-          <Link className="text-blue-600" href="https://nextjs.org">
-            Next.js!
+          <Link className="text-blue-600" href="/">
+            MyBooks!
           </Link>
         </h1>
       </main>
