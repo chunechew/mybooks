@@ -1,3 +1,4 @@
+import styled from "styled-components";
 import Navbar from "./Navbar";
 
 type Props = {
@@ -5,10 +6,16 @@ type Props = {
 };
 
 export default function Layout(props: Props) {
+  const MainWrapper = styled.div`
+    height: calc(100vh - 64px);
+  `;
+  
   return (
     <div className="w-full p-0">
       <Navbar />
-      {props.children}
+      <MainWrapper>
+        {props.children}
+      </MainWrapper>
     </div>
   );
 }

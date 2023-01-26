@@ -2,14 +2,18 @@ import { useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import { MenuIcon, XIcon } from "@heroicons/react/outline";
 import Link from "next/link";
+import styled from "styled-components";
 
 const Navbar = () => {
   const [menuToggle, setMenuToggle] = useState(false);
   const {data: session} = useSession();
+  const NavWrapper = styled.nav`
+    height: 64px;
+  `;
 
   return (
     //   navbar goes here
-    <nav className="bg-gray-100">
+    <NavWrapper className="bg-gray-100">
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex justify-between">
           <div className="flex space-x-4">
@@ -119,7 +123,7 @@ const Navbar = () => {
         </>
         }
       </div>
-    </nav>
+    </NavWrapper>
   );
 };
 

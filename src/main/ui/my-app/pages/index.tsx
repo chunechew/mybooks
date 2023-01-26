@@ -1,8 +1,18 @@
 import Link from "next/link";
+import tw from "tailwind-styled-components";
 
 const Index = () => {
+  const IndexWrapper = tw.div`
+    flex
+    flex-col
+    items-center
+    justify-center
+    h-full
+    py-2
+  `;
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2">
+    <IndexWrapper>
       <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
         <h1 className="text-6xl font-bold">
           Welcome to{" "}
@@ -11,7 +21,7 @@ const Index = () => {
           </Link>
         </h1>
       </main>
-    </div>
+    </IndexWrapper>
   );
 }
 
