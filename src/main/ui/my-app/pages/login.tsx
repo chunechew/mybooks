@@ -97,7 +97,7 @@ export default function SignIn({ csrfToken } : SignInArgs) {
                     type="submit"
                     className="bg-green-400 text-gray-100 p-3 rounded-lg w-full"
                   >
-                    {formik.isSubmitting ? '잠시만 기다려 주세요...' : '로그인'}
+                    {formik.isSubmitting ? '로그인 중...' : '로그인'}
                   </button>
                 </div>
               </div>

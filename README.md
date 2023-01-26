@@ -24,6 +24,9 @@
 * Styled-Components (사용 예정)
 * Tailwind CSS
 * tailwind-styled-components (Tailwind CSS에 Styled-Components를 얹은 패키지)
+* PostCSS
+* Formik (폼 데이터 처리용)
+* Yup (유효성 검증용)
 * Heroicons
 
 ### Backend
