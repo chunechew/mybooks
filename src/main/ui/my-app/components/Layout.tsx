@@ -11,7 +11,7 @@ export default function Layout(props: Props) {
   `;
   
   return (
-    <div className="w-full p-0">
+    <div className="w-full min-h-full p-0">
       <Navbar />
       <MainWrapper>
         {props.children}
