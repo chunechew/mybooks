@@ -4,11 +4,11 @@ import { Formik, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useRouter } from 'next/router';
 
-interface SignInArgs {
+interface LoginArgs {
   csrfToken: string,
 }
 
-export default function SignIn({ csrfToken } : SignInArgs) {
+export default function Login({ csrfToken } : LoginArgs) {
   const router = useRouter();
   const [error, setError] = useState(null);
 
