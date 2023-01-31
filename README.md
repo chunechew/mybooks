@@ -1,5 +1,7 @@
 # mybooks
-개인용 도서 관리 프로그램(혼자 실습용으로 FE, BE 모두 개발 중). 현재 개발 초기 단계임.
+개인용 도서 관리 프로그램(혼자 실습용으로 FE, BE 모두 개발 중).
+
+현재 개발 초기 단계로, Spring & Next.js 서버 실행 및 로그인/로그아웃 가능함.
 
 ## Specification
 ### 공통
@@ -21,7 +23,7 @@
 * NextAuth
 * React Query
 * Axios
-* Styled-Components (사용 예정)
+* Styled-Components
 * Tailwind CSS
 * tailwind-styled-components (Tailwind CSS에 Styled-Components를 얹은 패키지)
 * PostCSS
