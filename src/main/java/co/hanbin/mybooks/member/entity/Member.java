@@ -15,6 +15,7 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotBlank;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicUpdate;
 
 import co.hanbin.mybooks.member.enumerate.MemberRole;
 import lombok.Getter;
@@ -27,6 +28,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
+@DynamicUpdate
 public class Member {
     @Id
     @GeneratedValue

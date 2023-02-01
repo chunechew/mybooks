@@ -8,7 +8,9 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,7 +37,7 @@ public class MemberController {
     @Autowired
     private MemberService memberService;
 
-    @PostMapping("/signup")
+    @PutMapping("")
     public JsonResponse signUpUser(@RequestBody Member member){
         JsonResponse response = null;
 
@@ -60,7 +62,7 @@ public class MemberController {
         return memberService.logout(request, response);
     }
 
-    @PostMapping("/refreshToken")
+    @GetMapping("/refresh-token")
     public JsonResponse refreshToken(@RequestBody Member member, HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> result = memberService.refreshToken(member.getRefreshToken());
         String status = (String)(result.get("status"));
